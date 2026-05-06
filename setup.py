@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='into_datasci_utils',
+    name='intro_datasci_utils',
     install_requires=[
         "torch",
         "scipy",
