@@ -39,4 +39,4 @@ class UNSW(Dataset):
         return len(self.y)
     
     def __getitem__(self, idx):
-        return(torch.tensor(self.X[idx], dtype=torch.float32))
+        return (torch.tensor(self.X[idx], dtype=torch.float32)), (torch.tensor(self.y[idx], dtype=torch.float32))
