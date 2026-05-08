@@ -16,7 +16,7 @@ class NLS_KDD(Dataset):
         X = df.drop(['class'], axis=1)
 
         mapping = {'normal': 0, 'anomaly': 1}
-        self.y = df['label'].map(mapping).values
+        self.y = df['class'].map(mapping).values
 
         symbolic = ['protocol_type', 'service', 'flag']
         numeric = [c for c in X.columns if c not in symbolic]
