@@ -2,39 +2,32 @@ import torch
 from torch.utils.data import Dataset
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.feature_selection import mutual_info_classif, SelectPercentile
+
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder, LabelEncoder
 from scipy.sparse import issparse
 from numpy import ndarray
 
+symbolic = ['proto', 'service', 'state']
+
+def split(file):
+    df = pd.read_csv(file)
+    X = df.drop(['id', 'attack_cat', 'label'], axis=1)
+    y = df['label'].values
+
+    return X, y
+
 class UNSW(Dataset):
-    def __init__(self, file, transformer=None, extract_features=False) -> None:
+    def __init__(self, X, y, transformer=None, extracted_features = None) -> None:
         super().__init__()
 
         train = transformer is None
+        
+        self.y = y
 
-        df = pd.read_csv(file)
-        X = df.drop(['id', 'attack_cat', 'label'], axis=1)
-        self.y = df['label'].values
-
-        symbolic = ['proto', 'service', 'state']
         numeric = [c for c in X.columns if c not in symbolic]
 
-        if extract_features:
-            ex_X = X.copy()
-            for s in symbolic:
-                ex_X[s] = LabelEncoder().fit_transform(ex_X[s]) # type: ignore
-
-            discrete_features = [col in symbolic for col in ex_X.columns]
-            percent = SelectPercentile(
-                score_func=lambda X, y: mutual_info_classif(X, y, discrete_features=discrete_features),
-                percentile=50
-            )
-
-            p = percent.fit(X, self.y)  # type: ignore
-            features = ex_X.columns[p.get_support()]
-            
-            X = X[features]
+        if extracted_features is not None:
+            X = X[extracted_features]
 
         if transformer is not None:
             self.transformer = transformer
