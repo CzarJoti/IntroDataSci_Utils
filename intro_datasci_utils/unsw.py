@@ -26,14 +26,17 @@ class UNSW(Dataset):
 
         numeric = [c for c in X.columns if c not in symbolic]
 
+        sym = symbolic
+
         if extracted_features is not None:
             X = X[extracted_features]
+            sym = [s for s in symbolic if s in extracted_features]
 
         if transformer is not None:
             self.transformer = transformer
         else:
             self.transformer = ColumnTransformer([
-                    ('symbolic', OneHotEncoder(handle_unknown='ignore'), symbolic),
+                    ('symbolic', OneHotEncoder(handle_unknown='ignore'), sym),
                     ('numeric', MinMaxScaler(), numeric)
             ], sparse_threshold=0)
 
