@@ -2,12 +2,13 @@ import torch
 from torch.utils.data import Dataset
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
+from sklearn.feature_selection import mutual_info_classif, SelectPercentile
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder, LabelEncoder
 from scipy.sparse import issparse
 from numpy import ndarray
 
 class UNSW(Dataset):
-    def __init__(self, file, transformer=None) -> None:
+    def __init__(self, file, transformer=None, extract_features=False) -> None:
         super().__init__()
 
         train = transformer is None
@@ -18,6 +19,22 @@ class UNSW(Dataset):
 
         symbolic = ['proto', 'service', 'state']
         numeric = [c for c in X.columns if c not in symbolic]
+
+        if extract_features:
+            ex_X = X.copy()
+            for s in symbolic:
+                ex_X[s] = LabelEncoder().fit_transform(ex_X[s]) # type: ignore
+
+            discrete_features = [col in symbolic for col in ex_X.columns]
+            percent = SelectPercentile(
+                score_func=lambda X, y: mutual_info_classif(X, y, discrete_features=discrete_features),
+                percentile=50
+            )
+
+            p = percent.fit(X, self.y)  # type: ignore
+            features = ex_X.columns[p.get_support()]
+            
+            X = X[features]
 
         if transformer is not None:
             self.transformer = transformer
