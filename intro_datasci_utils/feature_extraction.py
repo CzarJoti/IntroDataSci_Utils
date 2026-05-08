@@ -12,7 +12,7 @@ def extract_features(X, y, symbolic):
                 percentile=50
             )
 
-            p = percent.fit(X, y)  # type: ignore
+            p = percent.fit(ex_X, y)  # type: ignore
             features = ex_X.columns[p.get_support()]
 
             return features
