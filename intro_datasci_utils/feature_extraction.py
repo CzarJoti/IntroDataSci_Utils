@@ -13,6 +13,8 @@ def extract_features(X, y, symbolic):
             )
 
             p = percent.fit(ex_X, y)  # type: ignore
-            features = ex_X.columns[p.get_support()]
+            features = p.get_feature_names_out()
 
-            return features
+            importances = mutual_info_classif(ex_X, y, discrete_features=discrete_features)
+
+            return features, importances, p.feature_names_in_
