@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import Dataset
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from scipy.sparse import issparse
 from numpy import ndarray
 
@@ -26,7 +26,7 @@ class NLS_KDD(Dataset):
         else:
             self.transformer = ColumnTransformer([
                     ('symbolic', OneHotEncoder(handle_unknown='ignore'), symbolic),
-                    ('numeric', StandardScaler(), numeric)
+                    ('numeric', MinMaxScaler(), numeric)
             ], sparse_threshold=0)
 
         tX  = self.transformer.fit_transform(X) if train else self.transformer.transform(X)
