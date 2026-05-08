@@ -24,13 +24,13 @@ class UNSW(Dataset):
         
         self.y = y
 
-        numeric = [c for c in X.columns if c not in symbolic]
-
         sym = symbolic
 
         if extracted_features is not None:
             X = X[extracted_features]
             sym = [s for s in symbolic if s in extracted_features]
+
+        numeric = [c for c in X.columns if c not in symbolic]
 
         if transformer is not None:
             self.transformer = transformer
